@@ -216,6 +216,21 @@ public class FullyImplementedBot implements Player {
         return myPokerHand.getOrderValue() > otherPokerHand.getOrderValue();
     }
 
+    /*
+    function HandStrength(ourcards, boardcards){
+     ahead = tied = behind = 0
+     ourrank = Rank(ourcards, boardcards)
+
+        for each case(oppcards) {
+            opprank = Rank(oppcards, boardcards)
+            if(ourrank > opprank) ahead++
+            else if (ourrank == opprank) tied++
+            else behind++
+        }
+        return (ahead + tied / 2) / (ahead + tied + behind)
+    }
+    */
+
     /**
      * **********************************************************************
      * <p/>
