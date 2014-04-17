@@ -1,4 +1,4 @@
-kvargbot
-========
+texas-holdem-javabot
+====================
 
-Cygni poker bot attempt!
+An example bot player for Texas Hold'em implemented in Java
