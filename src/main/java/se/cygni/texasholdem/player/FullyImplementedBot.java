@@ -82,7 +82,7 @@ public class FullyImplementedBot implements Player {
      */
     @Override
     public String getName() {
-        throw new RuntimeException("Did you forget to specify a name for your bot (hint: your email address is a good idea)?");
+        return "KVARGBOT-3000";
     }
 
     /**
