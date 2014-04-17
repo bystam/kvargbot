@@ -9,9 +9,11 @@ import se.cygni.texasholdem.communication.message.request.ActionRequest;
 import se.cygni.texasholdem.game.*;
 import se.cygni.texasholdem.game.definitions.PlayState;
 import se.cygni.texasholdem.game.definitions.PokerHand;
+import se.cygni.texasholdem.game.definitions.Rank;
+import se.cygni.texasholdem.game.definitions.Suit;
 import se.cygni.texasholdem.game.util.PokerHandUtil;
 
-import java.util.Formatter;
+import java.util.*;
 
 /**
  * This is an example Poker bot player, you can use it as
@@ -37,6 +39,12 @@ public class FullyImplementedBot implements Player {
     private final String serverHost;
     private final int serverPort;
     private final PlayerClient playerClient;
+    private Action callAction;
+    private Action checkAction;
+    private Action raiseAction;
+    private Action foldAction;
+    private Action allInAction;
+    private CurrentPlayState playState;
 
     /**
      * Default constructor for a Java Poker Bot.
@@ -129,39 +137,11 @@ public class FullyImplementedBot implements Player {
      * @return
      */
     private Action getBestAction(ActionRequest request) {
-        Action callAction = null;
-        Action checkAction = null;
-        Action raiseAction = null;
-        Action foldAction = null;
-        Action allInAction = null;
-
-        for (final Action action : request.getPossibleActions()) {
-            switch (action.getActionType()) {
-                case CALL:
-                    callAction = action;
-                    break;
-                case CHECK:
-                    checkAction = action;
-                    break;
-                case FOLD:
-                    foldAction = action;
-                    break;
-                case RAISE:
-                    raiseAction = action;
-                    break;
-                case ALL_IN:
-                    allInAction = action;
-                default:
-                    break;
-            }
-        }
+        setPossibleActions(request);
 
         // The current play state is accessible through this class. It
         // keeps track of basic events and other players.
-        CurrentPlayState playState = playerClient.getCurrentPlayState();
-
-        // The current BigBlind
-        long currentBB = playState.getBigBlind();
+        playState = playerClient.getCurrentPlayState();
 
         // PokerHandUtil is a hand classifier that returns the best hand given
         // the current community cards and your cards.
@@ -169,67 +149,41 @@ public class FullyImplementedBot implements Player {
         Hand myBestHand = pokerHandUtil.getBestHand();
         PokerHand myBestPokerHand = myBestHand.getPokerHand();
 
-        // Let's go ALL IN if hand is better than or equal to THREE_OF_A_KIND
-        if (allInAction != null && isHandBetterThan(myBestPokerHand, PokerHand.TWO_PAIRS)) {
-            return allInAction;
-        }
-
-        // Otherwise, be more careful CHECK if possible.
-        if (checkAction != null) {
-            return checkAction;
-        }
-
-        // Okay, we have either CALL or RAISE left
-        long callAmount = callAction == null ? -1 : callAction.getAmount();
-        long raiseAmount = raiseAction == null ? -1 : raiseAction.getAmount();
-
-        // Only call if ONE_PAIR or better
-        if (isHandBetterThan(myBestPokerHand, PokerHand.ONE_PAIR) && callAction != null) {
-            return callAction;
-        }
-
-        // Do I have something better than TWO_PAIR and can RAISE?
-        if (isHandBetterThan(myBestPokerHand, PokerHand.TWO_PAIRS) && raiseAction != null) {
-            return raiseAction;
-        }
-
-        // I'm small blind and we're in PRE_FLOP, might just as well call
-        if (playState.amISmallBlindPlayer() &&
-                playState.getCurrentPlayState() == PlayState.PRE_FLOP &&
-                callAction != null) {
-            return callAction;
-        }
-
-        // failsafe
         return foldAction;
     }
 
-    /**
-     * Compares two pokerhands.
-     *
-     * @param myPokerHand
-     * @param otherPokerHand
-     *
-     * @return TRUE if myPokerHand is valued higher than otherPokerHand
-     */
-    private boolean isHandBetterThan(PokerHand myPokerHand, PokerHand otherPokerHand) {
-        return myPokerHand.getOrderValue() > otherPokerHand.getOrderValue();
-    }
+    private double handStrength(CurrentPlayState playState) {
+        double ahead = 0, tied = 0, behind = 0;
+        List<Card> boardCards = playState.getCommunityCards();
+        List<Card> myCards = playState.getMyCards();
+        PokerHandUtil ourUtil = new PokerHandUtil(boardCards, myCards);
+        PokerHand ourRank = ourUtil.getBestHand().getPokerHand();
 
-    /*
-    function HandStrength(ourcards, boardcards){
-     ahead = tied = behind = 0
-     ourrank = Rank(ourcards, boardcards)
+        List<Card> unseenCards = getUnseenCards(myCards, boardCards);
 
-        for each case(oppcards) {
-            opprank = Rank(oppcards, boardcards)
-            if(ourrank > opprank) ahead++
-            else if (ourrank == opprank) tied++
-            else behind++
+        for (int i = 0; i < unseenCards.size(); i++) {
+            for (int k = i + 1; k < unseenCards.size(); k++) {
+                List<Card> oppCards = Arrays.asList(unseenCards.get(i), unseenCards.get(k));
+                PokerHandUtil oppUtil = new PokerHandUtil(boardCards, oppCards);
+                PokerHand oppRank = oppUtil.getBestHand().getPokerHand();
+                
+                if (ourRank.getOrderValue() > oppRank.getOrderValue())
+                    ahead++;
+                else if (ourRank.getOrderValue() == oppRank.getOrderValue())
+                    tied++;
+                else
+                    behind++;
+
+            }
         }
-        return (ahead + tied / 2) / (ahead + tied + behind)
+        return (ahead + tied / 2) / (ahead + tied + behind);
     }
-    */
+
+    private List<Card> getUnseenCards (List<Card> myCards, List<Card> boardCards) {
+        List<Card> unseen = Deck.getOrderedListOfCards();
+        unseen.removeAll (playState.getMyCardsAndCommunityCards());
+        return unseen;
+    }
 
     /**
      * **********************************************************************
@@ -385,5 +339,35 @@ public class FullyImplementedBot implements Player {
         log.debug("Server is shutting down");
     }
 
+
+
+    private void setPossibleActions(ActionRequest request) {
+        callAction = null;
+        checkAction = null;
+        raiseAction = null;
+        foldAction = null;
+        allInAction = null;
+
+        for (final Action action : request.getPossibleActions()) {
+            switch (action.getActionType()) {
+                case CALL:
+                    callAction = action;
+                    break;
+                case CHECK:
+                    checkAction = action;
+                    break;
+                case FOLD:
+                    foldAction = action;
+                    break;
+                case RAISE:
+                    raiseAction = action;
+                    break;
+                case ALL_IN:
+                    allInAction = action;
+                default:
+                    break;
+            }
+        }
+    }
 
 }
