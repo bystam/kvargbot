@@ -2,6 +2,7 @@ package se.cygni.texasholdem.player;
 
 import se.cygni.texasholdem.game.Card;
 import se.cygni.texasholdem.game.Hand;
+import se.cygni.texasholdem.game.definitions.CardSortBy;
 import se.cygni.texasholdem.game.definitions.Rank;
 
 import java.util.List;
@@ -18,5 +19,19 @@ public class CardUtils {
                 return cards.get(i).getRank();
         }
         throw new RuntimeException("hand has no pair");
+    }
+
+    public static Rank getHighestTwoPairRank (Hand hand) {
+        List<Card> cards = hand.getCards();
+        Rank highest = null;
+        for (int i = 0; i < cards.size() - 1; i++) {
+            if (cards.get(i).getRank() == cards.get(i+1).getRank()) {
+                if (highest == null || highest.getOrderValue() < cards.get(i).getRank().getOrderValue())
+                    highest = cards.get(i).getRank();
+            }
+        }
+        if (highest == null)
+            throw new RuntimeException("hand has no pair");
+        return highest;
     }
 }

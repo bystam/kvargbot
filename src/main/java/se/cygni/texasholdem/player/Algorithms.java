@@ -90,6 +90,7 @@ public class Algorithms {
 
         switch(my.getPokerHand()) {
             case ONE_PAIR: return comparePairs(my, opp);
+            case TWO_PAIRS: return compareTwoPairs(my, opp);
             default: break;
         }
         return 0;
@@ -98,7 +99,17 @@ public class Algorithms {
     private int comparePairs(Hand my, Hand opp) {
         Rank myPair = CardUtils.getPairRank(my);
         Rank oppPair = CardUtils.getPairRank(opp);
-        int diff = myPair.getOrderValue() - oppPair.getOrderValue();
+        return compareRanks(myPair, oppPair);
+    }
+
+    private int compareTwoPairs(Hand my, Hand opp) {
+        Rank myTwoPairs = CardUtils.getHighestTwoPairRank(my);
+        Rank oppTwoPairs = CardUtils.getHighestTwoPairRank(opp);
+        return compareRanks(myTwoPairs, oppTwoPairs);
+    }
+
+    private int compareRanks (Rank my, Rank opp) {
+        int diff = my.getOrderValue() - opp.getOrderValue();
         return diff > 0 ? -1 : (diff == 0 ? 0 : 1);
     }
 

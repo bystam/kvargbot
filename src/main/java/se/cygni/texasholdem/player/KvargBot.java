@@ -160,7 +160,7 @@ public class KvargBot implements Player {
     	double chenScore = algorithms.chenFormula();
     	if(chenScore > 9 && raiseAction != null) 
     		return raiseAction;
-    	else if (chenScore >= 8 && callAction != null)
+    	else if (chenScore >= 5 && callAction != null)
     		return callAction;
         return checkAction != null ? checkAction : foldAction;
     }
@@ -175,34 +175,17 @@ public class KvargBot implements Player {
 
     private Action river() {
         double handStrength = algorithms.getHandStrength();
-        log.debug("\n\n\n" + handStrength + "\n\n\n");
-        if (handStrength > 0.8 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
+        if (someoneIsAllIn())
+            handStrength -= 0.15;
+        if (handStrength > 0.85 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
             return allInAction;
-        if (handStrength > 0.6 && raiseAction != null)
+        if (handStrength > 0.65 && raiseAction != null)
             return raiseAction;
         if (getNumberOfOpponents() == 1)
             handStrength += 0.2;
         if (handStrength > 0.4 && callAction != null)
             return callAction;
         return checkAction != null ? checkAction : foldAction;
-    }
-
-    private boolean shouldAllIn(double handStrength) {
-        boolean hasPair = myHand.getPokerHand().getOrderValue() == PokerHand.ONE_PAIR.getOrderValue();
-        if (hasPair)
-            return false;
-        return handStrength > 0.8 && allInAction != null;
-    }
-
-    private boolean shouldRaise(double handStrength) {
-        return handStrength > 0.6 && raiseAction != null;
-    }
-
-    private boolean shouldCall(double handStrength) {
-        if (getNumberOfOpponents() == 1)
-            handStrength += 0.2;
-        boolean isFreeCall = playState.amIBigBlindPlayer() && boardCards.isEmpty();
-        return (handStrength > 0.4 || isFreeCall) && callAction != null;
     }
 
     private int getNumberOfOpponents () {
@@ -214,6 +197,12 @@ public class KvargBot implements Player {
         myHand = ourUtil.getBestHand();
     }
 
+    private boolean someoneIsAllIn () {
+        for (GamePlayer player : playState.getPlayers())
+            if (playState.hasPlayerGoneAllIn(player))
+                return true;
+        return false;
+    }
 
     /**
      * **********************************************************************
