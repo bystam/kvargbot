@@ -91,6 +91,8 @@ public class Algorithms {
         switch(my.getPokerHand()) {
             case ONE_PAIR: return comparePairs(my, opp);
             case TWO_PAIRS: return compareTwoPairs(my, opp);
+            case THREE_OF_A_KIND: return compareThreeOfAKing(my, opp);
+            case STRAIGHT: return compareStraight (my, opp);
             default: break;
         }
         return 0;
@@ -106,6 +108,18 @@ public class Algorithms {
         Rank myTwoPairs = CardUtils.getHighestTwoPairRank(my);
         Rank oppTwoPairs = CardUtils.getHighestTwoPairRank(opp);
         return compareRanks(myTwoPairs, oppTwoPairs);
+    }
+
+    private int compareThreeOfAKing(Hand my, Hand opp) {
+        Rank myThree = CardUtils.getThreeOfAKindRank(my);
+        Rank oppThree = CardUtils.getThreeOfAKindRank(opp);
+        return compareRanks(myThree, oppThree);
+    }
+
+    private int compareStraight(Hand my, Hand opp) {
+        Rank myStraight = CardUtils.getStraightRank(my);
+        Rank oppStraight = CardUtils.getStraightRank(opp);
+        return compareRanks(myStraight, oppStraight);
     }
 
     private int compareRanks (Rank my, Rank opp) {
