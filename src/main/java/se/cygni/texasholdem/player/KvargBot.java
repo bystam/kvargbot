@@ -203,7 +203,7 @@ public class KvargBot implements Player {
             int index;
             if (myRank.compareTo(oppRank) < 0) // myhand > opprank
                 index = AHEAD;
-            if (myRank.compareTo(oppRank) == 0) // myhand == opprank
+            else if (myRank.compareTo(oppRank) == 0) // myhand == opprank
                 index = TIED;
             else
                 index = BEHIND;
@@ -216,7 +216,7 @@ public class KvargBot implements Player {
 
                 if (ourBest.compareTo(oppBest) < 0) // myBest > oppBest
                     HP[index][AHEAD]++;
-                if (ourBest.compareTo(oppBest) == 0) // myBest == oppBest
+                else if (ourBest.compareTo(oppBest) == 0) // myBest == oppBest
                     HP[index][TIED]++;
                 else
                     HP[index][BEHIND]++;
