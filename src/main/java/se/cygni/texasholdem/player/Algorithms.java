@@ -50,11 +50,9 @@ public class Algorithms {
     	}
     	
 		return baseScore - (double) gap;
-    	
     }
     
     private double getChenCardScore (Card card) {
-    	
     	switch(card.getRank()) {
     	case ACE: return 10;
     	case KING: return 8;

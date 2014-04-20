@@ -43,6 +43,7 @@ public class KvargBot implements Player {
     private CurrentPlayState playState;
     private Hand myHand;
     private List<Card> boardCards;
+    private Algorithms algorithms;
 
     /**
      * Default constructor for a Java Poker Bot.
@@ -138,41 +139,37 @@ public class KvargBot implements Player {
         setPossibleActions(request);
         playState = playerClient.getCurrentPlayState();
         boardCards = playState.getCommunityCards();
+        algorithms = new Algorithms(playState);
         setMyHand();
-        Algorithms algorithms = new Algorithms(playState);
-
-        if (shouldFoldBeforeFlop ())
-            return foldAction;
 
         double winChance = algorithms.getHandStrength();
 
-        if (shouldAllIn(winChance))
-            return allInAction;
-        if (shouldRaise(winChance))
-            return raiseAction;
-        if (shouldCall(winChance))
-            return callAction;
-        if (checkAction != null)
-            return checkAction;
+        if (boardCards.size() == 0) // pre-flop
+            return preFlop();
+        else if (boardCards.size() == 3) // flop
+            return flop();
+        else if (boardCards.size() == 4) // turn
+            return turn();
+        else if (boardCards.size() == 5) // river
+            return river();
 
         return foldAction;
     }
 
-    private boolean shouldFoldBeforeFlop() {
-        if (!boardCards.isEmpty())
-            return false;
+    private Action preFlop() {
+        return null;
+    }
 
-        Card high = myHand.getCards().get(0);
-        Card low = myHand.getCards().get(1);
-        if (high.getRank().getOrderValue() < low.getRank().getOrderValue()) {
-            Card tmp = high;
-            high = low;
-            low = tmp;
-        }
-        if (high.getSuit() != low.getSuit())
-            if (high.getRank().getOrderValue() - low.getRank().getOrderValue() >= 5)
-                return true;
-        return false;
+    private Action flop() {
+        return null;
+    }
+
+    private Action turn() {
+        return null;
+    }
+
+    private Action river() {
+        return null;
     }
 
     private boolean shouldAllIn(double handStrength) {
