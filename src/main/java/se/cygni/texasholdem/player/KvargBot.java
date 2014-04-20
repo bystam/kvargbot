@@ -234,87 +234,87 @@ public class KvargBot implements Player {
 
     @Override
     public void onPlayIsStarted(final PlayIsStartedEvent event) {
-        log.debug("Play is started");
+        //log.debug("Play is started");
     }
 
     @Override
     public void onTableChangedStateEvent(TableChangedStateEvent event) {
 
-        log.debug("Table changed state: {}", event.getState());
+        //log.debug("Table changed state: {}", event.getState());
     }
 
     @Override
     public void onYouHaveBeenDealtACard(final YouHaveBeenDealtACardEvent event) {
 
-        log.debug("I, {}, got a card: {}", getName(), event.getCard());
+        //log.debug("I, {}, got a card: {}", getName(), event.getCard());
     }
 
     @Override
     public void onCommunityHasBeenDealtACard(
             final CommunityHasBeenDealtACardEvent event) {
 
-        log.debug("Community got a card: {}", event.getCard());
+        //log.debug("Community got a card: {}", event.getCard());
     }
 
     @Override
     public void onPlayerBetBigBlind(PlayerBetBigBlindEvent event) {
 
-        log.debug("{} placed big blind with amount {}", event.getPlayer().getName(), event.getBigBlind());
+        //log.debug("{} placed big blind with amount {}", event.getPlayer().getName(), event.getBigBlind());
     }
 
     @Override
     public void onPlayerBetSmallBlind(PlayerBetSmallBlindEvent event) {
 
-        log.debug("{} placed small blind with amount {}", event.getPlayer().getName(), event.getSmallBlind());
+        //log.debug("{} placed small blind with amount {}", event.getPlayer().getName(), event.getSmallBlind());
     }
 
     @Override
     public void onPlayerFolded(final PlayerFoldedEvent event) {
 
-        log.debug("{} folded after putting {} in the pot", event.getPlayer().getName(), event.getInvestmentInPot());
+        //log.debug("{} folded after putting {} in the pot", event.getPlayer().getName(), event.getInvestmentInPot());
     }
 
     @Override
     public void onPlayerForcedFolded(PlayerForcedFoldedEvent event) {
 
-        log.debug("NOT GOOD! {} was forced to fold after putting {} in the pot because exceeding the time limit", event.getPlayer().getName(), event.getInvestmentInPot());
+        //log.debug("NOT GOOD! {} was forced to fold after putting {} in the pot because exceeding the time limit", event.getPlayer().getName(), event.getInvestmentInPot());
     }
 
     @Override
     public void onPlayerCalled(final PlayerCalledEvent event) {
 
-        log.debug("{} called with amount {}", event.getPlayer().getName(), event.getCallBet());
+        //log.debug("{} called with amount {}", event.getPlayer().getName(), event.getCallBet());
     }
 
     @Override
     public void onPlayerRaised(final PlayerRaisedEvent event) {
 
-        log.debug("{} raised with bet {}", event.getPlayer().getName(), event.getRaiseBet());
+        //log.debug("{} raised with bet {}", event.getPlayer().getName(), event.getRaiseBet());
     }
 
     @Override
     public void onTableIsDone(TableIsDoneEvent event) {
 
-        log.debug("Table is done, I'm leaving the table with ${}", playerClient.getCurrentPlayState().getMyCurrentChipAmount());
-        log.info("Ending poker session, the last game may be viewed at: http://{}/showgame/table/{}", serverHost, playerClient.getCurrentPlayState().getTableId());
+        //log.debug("Table is done, I'm leaving the table with ${}", playerClient.getCurrentPlayState().getMyCurrentChipAmount());
+        //log.info("Ending poker session, the last game may be viewed at: http://{}/showgame/table/{}", serverHost, playerClient.getCurrentPlayState().getTableId());
     }
 
     @Override
     public void onPlayerWentAllIn(final PlayerWentAllInEvent event) {
 
-        log.debug("{} went all in with amount {}", event.getPlayer().getName(), event.getAllInAmount());
+        //log.debug("{} went all in with amount {}", event.getPlayer().getName(), event.getAllInAmount());
     }
 
     @Override
     public void onPlayerChecked(final PlayerCheckedEvent event) {
 
-        log.debug("{} checked", event.getPlayer().getName());
+        //log.debug("{} checked", event.getPlayer().getName());
     }
 
     @Override
     public void onYouWonAmount(final YouWonAmountEvent event) {
 
-        log.debug("I, {}, won: {}", getName(), event.getWonAmount());
+        //log.debug("I, {}, won: {}", getName(), event.getWonAmount());
     }
 
     @Override
