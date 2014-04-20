@@ -157,7 +157,12 @@ public class KvargBot implements Player {
     }
 
     private Action preFlop() {
-        return null;
+    	double chenScore = algorithms.chenFormula(myHand.getCards().get(0), myHand.getCards().get(1));
+    	if(chenScore > 9 && raiseAction != null) 
+    		return raiseAction;
+    	else if (chenScore >= 8 && callAction != null)
+    		return callAction;
+        return checkAction != null ? checkAction : foldAction;
     }
 
     private Action flop() {
