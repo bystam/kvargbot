@@ -5,6 +5,8 @@ import se.cygni.texasholdem.game.Card;
 import se.cygni.texasholdem.game.Deck;
 import se.cygni.texasholdem.game.Hand;
 import se.cygni.texasholdem.game.definitions.PokerHand;
+import se.cygni.texasholdem.game.definitions.Rank;
+import static se.cygni.texasholdem.game.definitions.Rank.*;
 import se.cygni.texasholdem.game.util.PokerHandUtil;
 
 import java.util.ArrayList;
@@ -26,6 +28,41 @@ public class Algorithms {
         myHand = new PokerHandUtil(boardCards, playState.getMyCards()).getBestHand();
     }
 
+    public double chenFormula (Card one, Card two) {
+    	int cardOneValue = one.getRank().getOrderValue();
+    	int cardTwoValue = two.getRank().getOrderValue();
+    	double baseScore = Math.max(getChenCardScore(one), getChenCardScore(two));
+    	if(cardOneValue == cardTwoValue) {
+    		baseScore = Math.max(5, baseScore * 2);
+    	}
+    	if(one.getSuit().compareTo(two.getSuit()) == 0) {
+    		baseScore += 2;
+    	}
+    	
+    	int gap = Math.abs(cardOneValue - cardTwoValue);
+    	switch (gap) {
+    	case 0: break;
+    	case 1: baseScore++; break;
+    	case 2: baseScore--; break;
+    	case 3: baseScore -= 2; break;
+    	case 4: baseScore -= 4; break;
+    	default: baseScore -= 5; break;
+    	}
+    	
+		return baseScore - (double) gap;
+    	
+    }
+    
+    private double getChenCardScore (Card card) {
+    	
+    	switch(card.getRank()) {
+    	case ACE: return 10;
+    	case KING: return 8;
+    	case QUEEN: return 7;
+    	case JACK: return 6;
+    	default: return card.getRank().getOrderValue() / 2.0;
+    	}
+    }
     public double getHandStrength() {
         double ahead = 0, tied = 0, behind = 0;
 
