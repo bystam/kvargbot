@@ -12,6 +12,10 @@ import java.util.List;
  */
 public class CardUtils {
 
+    public static Rank getHighHandRank(Hand hand) {
+        return hand.getCards().get(0).getRank();
+    }
+
     public static Rank getPairRank (Hand hand) {
         List<Card> cards = hand.getCards();
         for (int i = 0; i < cards.size() - 1; i++) {
@@ -47,6 +51,6 @@ public class CardUtils {
     }
 
     public static Rank getStraightRank (Hand hand) {
-        return hand.getCards().get(0).getRank();
+        return getHighHandRank(hand);
     }
 }

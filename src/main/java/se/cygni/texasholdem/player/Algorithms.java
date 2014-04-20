@@ -89,12 +89,19 @@ public class Algorithms {
             return 1;
 
         switch(my.getPokerHand()) {
+            case HIGH_HAND: return compareHighHand(my, opp);
             case ONE_PAIR: return comparePairs(my, opp);
             case TWO_PAIRS: return compareTwoPairs(my, opp);
             case THREE_OF_A_KIND: return compareThreeOfAKing(my, opp);
             case STRAIGHT: return compareStraight (my, opp);
             default: break;
         }
+        return 0;
+    }
+
+    private int compareHighHand(Hand my, Hand opp) {
+        Rank myPair = CardUtils.getHighHandRank(my);
+        Rank oppPair = CardUtils.getHighHandRank(opp);
         return 0;
     }
 
