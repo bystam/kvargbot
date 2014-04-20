@@ -162,6 +162,8 @@ public class KvargBot implements Player {
     		return raiseAction;
     	else if (chenScore >= 5 && callAction != null)
     		return callAction;
+        else if (getNumberOfOpponents() == 1 && chenScore >= 1 && callAction != null)
+            return callAction;
         return checkAction != null ? checkAction : foldAction;
     }
 
