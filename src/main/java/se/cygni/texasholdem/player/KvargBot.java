@@ -161,15 +161,25 @@ public class KvargBot implements Player {
     }
 
     private Action flop() {
-        return null;
+        return river();
     }
 
     private Action turn() {
-        return null;
+        return river();
     }
 
     private Action river() {
-        return null;
+        double handStrength = algorithms.getHandStrength();
+        if (handStrength > 0.8 && allInAction != null)
+            return allInAction;
+        if (handStrength > 0.6 && raiseAction != null)
+            return raiseAction;
+        if (getNumberOfOpponents() == 1)
+            handStrength += 0.2;
+        boolean isFreeCall = playState.amIBigBlindPlayer() && boardCards.isEmpty();
+        if ((handStrength > 0.4 || isFreeCall) && callAction != null)
+            return callAction;
+        return checkAction != null ? checkAction : foldAction;
     }
 
     private boolean shouldAllIn(double handStrength) {
