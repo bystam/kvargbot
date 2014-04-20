@@ -137,20 +137,42 @@ public class KvargBot implements Player {
     private Action getBestAction(ActionRequest request) {
         setPossibleActions(request);
         playState = playerClient.getCurrentPlayState();
+        boardCards = playState.getCommunityCards();
         setMyHand();
-        setBoardCards();
+        Algorithms algorithms = new Algorithms(playState);
 
-        double handStrength = getHandStrength();
-        if (shouldAllIn(handStrength))
+        if (shouldFoldBeforeFlop ())
+            return foldAction;
+
+        double winChance = algorithms.getHandStrength();
+
+        if (shouldAllIn(winChance))
             return allInAction;
-        if (shouldRaise(handStrength))
+        if (shouldRaise(winChance))
             return raiseAction;
-        if (shouldCall(handStrength))
+        if (shouldCall(winChance))
             return callAction;
         if (checkAction != null)
             return checkAction;
 
         return foldAction;
+    }
+
+    private boolean shouldFoldBeforeFlop() {
+        if (!boardCards.isEmpty())
+            return false;
+
+        Card high = myHand.getCards().get(0);
+        Card low = myHand.getCards().get(1);
+        if (high.getRank().getOrderValue() < low.getRank().getOrderValue()) {
+            Card tmp = high;
+            high = low;
+            low = tmp;
+        }
+        if (high.getSuit() != low.getSuit())
+            if (high.getRank().getOrderValue() - low.getRank().getOrderValue() >= 5)
+                return true;
+        return false;
     }
 
     private boolean shouldAllIn(double handStrength) {
@@ -175,121 +197,11 @@ public class KvargBot implements Player {
         return playState.getNumberOfPlayers() - playState.getNumberOfFoldedPlayers() - 1;
     }
 
-    private double getHandStrength() {
-        double ahead = 0, tied = 0, behind = 0;
-        setBoardCards();
-
-        for (Hand oppHand : getAllOpponentCombinations()) {
-            PokerHand myRank = myHand.getPokerHand();
-            PokerHand oppRank = oppHand.getPokerHand();
-            if (myRank.compareTo(oppRank) < 0)
-                ahead++;
-            else if (myRank.compareTo(oppRank) == 0)
-                tied++;
-            else
-                behind++;
-
-        }
-        return (ahead + tied / 2) / (ahead + tied + behind);
-    }
-
-    static final int AHEAD = 0, TIED = 1, BEHIND = 2;
-
-    private HandPotential getHandPotential () {
-        double HP[][] = new double[3][3], HPTotal[] = new double[3];
-        for (Hand oppHand : getAllOpponentCombinations()) {
-            PokerHand myRank = myHand.getPokerHand();
-            PokerHand oppRank = oppHand.getPokerHand();
-            int index;
-            if (myRank.compareTo(oppRank) < 0) // myhand > opprank
-                index = AHEAD;
-            else if (myRank.compareTo(oppRank) == 0) // myhand == opprank
-                index = TIED;
-            else
-                index = BEHIND;
-
-            HPTotal[index]++;
-
-            for (List<Card> possibleBoard : getAllPossibleBoardFinishes(oppHand)) {
-                PokerHand ourBest = new PokerHandUtil(possibleBoard, myHand.getCards()).getBestHand().getPokerHand();
-                PokerHand oppBest = new PokerHandUtil(possibleBoard, oppHand.getCards()).getBestHand().getPokerHand();
-
-                if (ourBest.compareTo(oppBest) < 0) // myBest > oppBest
-                    HP[index][AHEAD]++;
-                else if (ourBest.compareTo(oppBest) == 0) // myBest == oppBest
-                    HP[index][TIED]++;
-                else
-                    HP[index][BEHIND]++;
-            }
-        }
-
-        double ppot = (HP[BEHIND][AHEAD] + HP[BEHIND][TIED]/2 + HP[TIED][AHEAD]/2) / (HPTotal[BEHIND]+HPTotal[TIED]/2);
-        double npot = (HP[AHEAD][BEHIND] + HP[TIED][BEHIND]/2 + HP[AHEAD][TIED]/2) / (HPTotal[AHEAD]+HPTotal[TIED]/2);
-
-        return new HandPotential(ppot, npot);
-    }
-
-    private void setBoardCards() {
-        boardCards = playState.getCommunityCards();
-    }
-
     private void setMyHand() {
-        List<Card> myCards = playState.getMyCards();
-        PokerHandUtil ourUtil = new PokerHandUtil(playState.getCommunityCards(), myCards);
+        PokerHandUtil ourUtil = new PokerHandUtil(boardCards, playState.getMyCards());
         myHand = ourUtil.getBestHand();
     }
 
-    private List<Card> getUnseenCards () {
-        List<Card> unseen = Deck.getOrderedListOfCards();
-        unseen.removeAll (playState.getMyCardsAndCommunityCards());
-        return unseen;
-    }
-    
-    private List<List<Card>> getAllPossibleBoardFinishes(Hand oppHand) {
-    	List<Card> unseenCards = getUnseenCards();
-    	unseenCards.removeAll (oppHand.getCards());
-    	List<List<Card>> allPossibleBoardFinishes = new ArrayList<>();
-
-    	for (int i = 0; i < unseenCards.size(); i++) {
-            List<Card> possibleBoardFinish = new ArrayList<>(boardCards);
-            allPossibleBoardFinishes.add(possibleBoardFinish);
-
-            possibleBoardFinish.add(unseenCards.get(i));
-            if (possibleBoardFinish.size() == 5) // completed with only one card
-                continue;
-
-            for (int k = i + 1; k < unseenCards.size(); k++) {
-                possibleBoardFinish.add(unseenCards.get(k));
-            }
-            if (possibleBoardFinish.size() != 5)
-                throw new IllegalStateException("Possible boardcards are not 5");
-    	}
-    	return allPossibleBoardFinishes;
-    }
-
-    private List<Hand> getAllOpponentCombinations() {
-        List<Hand> allCombinations = new ArrayList<>();
-        List<Card> unseenCards = getUnseenCards();
-        for (int i = 0; i < unseenCards.size(); i++) {
-            for (int k = i + 1; k < unseenCards.size(); k++) {
-                List<Card> oppCards = Arrays.asList(unseenCards.get(i), unseenCards.get(k));
-                PokerHandUtil oppUtil = new PokerHandUtil(boardCards, oppCards);
-                Hand oppHand = oppUtil.getBestHand();
-
-                allCombinations.add(oppHand);
-            }
-        }
-        return allCombinations;
-    }
-
-    private static final class HandPotential {
-        final double ppot, npot;
-
-        HandPotential (double ppot, double npot) {
-            this.ppot = ppot;
-            this.npot = npot;
-        }
-    }
 
     /**
      * **********************************************************************
