@@ -28,7 +28,9 @@ public class Algorithms {
         myHand = new PokerHandUtil(boardCards, playState.getMyCards()).getBestHand();
     }
 
-    public double chenFormula (Card one, Card two) {
+    public double chenFormula () {
+        Card one = playState.getMyCards().get(0);
+        Card two = playState.getMyCards().get(1);
     	int cardOneValue = one.getRank().getOrderValue();
     	int cardTwoValue = two.getRank().getOrderValue();
     	double baseScore = Math.max(getChenCardScore(one), getChenCardScore(two));
@@ -49,7 +51,7 @@ public class Algorithms {
     	default: baseScore -= 5; break;
     	}
     	
-		return baseScore - (double) gap;
+		return baseScore;// - (double) gap;
     }
     
     private double getChenCardScore (Card card) {
@@ -67,15 +69,25 @@ public class Algorithms {
         for (Hand oppHand : getAllOpponentCombinations()) {
             PokerHand myRank = myHand.getPokerHand();
             PokerHand oppRank = oppHand.getPokerHand();
-            if (myRank.compareTo(oppRank) < 0)
+            if (compareHands(myHand, oppHand) < 0)
                 ahead++;
-            else if (myRank.compareTo(oppRank) == 0)
+            else if (compareHands(myHand, oppHand) == 0)
                 tied++;
             else
                 behind++;
 
         }
         return (ahead + tied / 2) / (ahead + tied + behind);
+    }
+
+    private int compareHands (Hand my, Hand opp) {
+        if (my.getPokerHand().getOrderValue() > opp.getPokerHand().getOrderValue())
+            return -1;
+        else if (my.getPokerHand().getOrderValue() < opp.getPokerHand().getOrderValue())
+            return 1;
+
+
+        return 0;
     }
 
     private List<Hand> getAllOpponentCombinations() {
