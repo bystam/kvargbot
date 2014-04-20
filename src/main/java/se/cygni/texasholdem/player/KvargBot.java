@@ -244,6 +244,24 @@ public class KvargBot implements Player {
         unseen.removeAll (playState.getMyCardsAndCommunityCards());
         return unseen;
     }
+    
+    private List<List<Card>> getAllPossibleBoardFinishes(List<Card> oppHand) {
+    	List<Card> unseenCards = getUnseenCards();
+    	unseenCards.removeAll (oppHand);
+    	List<List<Card>> allPossibleBoardFinishes = ;
+    	for (int i = 0; i < unseenCards.size(); i++) {
+    		
+    		if(boardCards.size() == 3) {
+    			for (int k = i + 1; k < unseenCards.size(); k++) {
+    			}
+    		}
+    		else {
+    			
+    	}
+    	
+    	}
+    	return 
+    }
 
     private List<PokerHand> getAllOpponentCombinations() {
         List<PokerHand> allCombinations = new ArrayList<>();
