@@ -251,16 +251,20 @@ public class KvargBot implements Player {
     	List<Card> unseenCards = getUnseenCards();
     	unseenCards.removeAll (oppHand.getCards());
     	List<List<Card>> allPossibleBoardFinishes = new ArrayList<>();
+
     	for (int i = 0; i < unseenCards.size(); i++) {
-    		
-    		if(boardCards.size() == 3) {
-    			for (int k = i + 1; k < unseenCards.size(); k++) {
-    			}
-    		}
-    		else {
-    			
-    	}
-    	
+            List<Card> possibleBoardFinish = new ArrayList<>(boardCards);
+            allPossibleBoardFinishes.add(possibleBoardFinish);
+
+            possibleBoardFinish.add(unseenCards.get(i));
+            if (possibleBoardFinish.size() == 5) // completed with only one card
+                continue;
+
+            for (int k = i + 1; k < unseenCards.size(); k++) {
+                possibleBoardFinish.add(unseenCards.get(k));
+            }
+            if (possibleBoardFinish.size() != 5)
+                throw new IllegalStateException("Possible boardcards are not 5");
     	}
     	return allPossibleBoardFinishes;
     }
