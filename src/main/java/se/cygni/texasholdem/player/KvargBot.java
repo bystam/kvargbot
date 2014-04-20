@@ -179,10 +179,11 @@ public class KvargBot implements Player {
         double ahead = 0, tied = 0, behind = 0;
         setBoardCards();
 
-        for (PokerHand oppHand : getAllOpponentCombinations()) {
-            if (myHand.compareTo(oppHand) < 0)
+        for (Hand oppHand : getAllOpponentCombinations()) {
+            PokerHand oppRank = oppHand.getPokerHand();
+            if (myHand.compareTo(oppRank) < 0)
                 ahead++;
-            else if (myHand.compareTo(oppHand) == 0)
+            else if (myHand.compareTo(oppRank) == 0)
                 tied++;
             else
                 behind++;
@@ -196,11 +197,12 @@ public class KvargBot implements Player {
     private HandPotential getHandPotential () {
         double ppot = .0, npot = .0;
         int HP[][] = new int[3][3], HPTotal[] = new int[3];
-        for (PokerHand oppRank : getAllOpponentCombinations()) {
+        for (Hand oppHand : getAllOpponentCombinations()) {
+            PokerHand oppRank = oppHand.getPokerHand();
             int index;
-            if (myHand.compareTo(oppRan) < 0) // myhand > opprank
+            if (myHand.compareTo(oppRank) < 0) // myhand > opprank
                 index = AHEAD;
-            if (myHand.compareTo(oppRan) == 0) // myhand > opprank
+            if (myHand.compareTo(oppRank) == 0) // myhand > opprank
                 index = TIED;
             else
                 index = BEHIND;
@@ -245,10 +247,10 @@ public class KvargBot implements Player {
         return unseen;
     }
     
-    private List<List<Card>> getAllPossibleBoardFinishes(List<Card> oppHand) {
+    private List<List<Card>> getAllPossibleBoardFinishes(Hand oppHand) {
     	List<Card> unseenCards = getUnseenCards();
-    	unseenCards.removeAll (oppHand);
-    	List<List<Card>> allPossibleBoardFinishes = ;
+    	unseenCards.removeAll (oppHand.getCards());
+    	List<List<Card>> allPossibleBoardFinishes = new ArrayList<>();
     	for (int i = 0; i < unseenCards.size(); i++) {
     		
     		if(boardCards.size() == 3) {
@@ -260,17 +262,17 @@ public class KvargBot implements Player {
     	}
     	
     	}
-    	return 
+    	return allPossibleBoardFinishes;
     }
 
-    private List<PokerHand> getAllOpponentCombinations() {
-        List<PokerHand> allCombinations = new ArrayList<>();
+    private List<Hand> getAllOpponentCombinations() {
+        List<Hand> allCombinations = new ArrayList<>();
         List<Card> unseenCards = getUnseenCards();
         for (int i = 0; i < unseenCards.size(); i++) {
             for (int k = i + 1; k < unseenCards.size(); k++) {
                 List<Card> oppCards = Arrays.asList(unseenCards.get(i), unseenCards.get(k));
                 PokerHandUtil oppUtil = new PokerHandUtil(boardCards, oppCards);
-                PokerHand oppHand = oppUtil.getBestHand().getPokerHand();
+                Hand oppHand = oppUtil.getBestHand();
 
                 allCombinations.add(oppHand);
             }
