@@ -142,8 +142,6 @@ public class KvargBot implements Player {
         algorithms = new Algorithms(playState);
         setMyHand();
 
-        double winChance = algorithms.getHandStrength();
-
         if (boardCards.size() == 0) // pre-flop
             return preFlop();
         else if (boardCards.size() == 3) // flop
@@ -158,11 +156,11 @@ public class KvargBot implements Player {
 
     private Action preFlop() {
     	double chenScore = algorithms.chenFormula();
-    	if(chenScore > 10 && raiseAction != null)
+    	if(chenScore > 11 && raiseAction != null)
     		return raiseAction;
-    	else if (chenScore >= 5 && callAction != null)
+    	else if (chenScore >= 7 && callAction != null)
     		return callAction;
-        else if (getNumberOfOpponents() == 1 && chenScore >= 1 && callAction != null)
+        else if (getNumberOfOpponents() == 1 && chenScore >= 3 && callAction != null)
             return callAction;
         return checkAction != null ? checkAction : foldAction;
     }
@@ -179,13 +177,13 @@ public class KvargBot implements Player {
         double handStrength = algorithms.getHandStrength();
         if (someoneIsAllIn())
             handStrength -= 0.15;
-        if (handStrength > 0.85 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
-            return allInAction;
+        if (handStrength > 0.9 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
+            return allIn(handStrength);
         if (handStrength > 0.7 && raiseAction != null)
             return raiseAction;
         if (getNumberOfOpponents() == 1)
             handStrength += 0.2;
-        if (handStrength > 0.4 && callAction != null)
+        if (handStrength > 0.5 && callAction != null)
             return callAction;
         return checkAction != null ? checkAction : foldAction;
     }
@@ -204,6 +202,17 @@ public class KvargBot implements Player {
             if (playState.hasPlayerGoneAllIn(player))
                 return true;
         return false;
+    }
+
+    private Action allIn (double handStrength) {
+        if (handStrength > 0.95)
+            return allInAction;
+        long myChips = playState.getMyCurrentChipAmount();
+        for (GamePlayer player : playState.getPlayers()) {
+            if (!getName().equals(player.getName()) && player.getChipCount() > myChips)
+                return raiseAction; // we don't have the most chips... all in seems unsafe
+        }
+        return allInAction;
     }
 
     /**
