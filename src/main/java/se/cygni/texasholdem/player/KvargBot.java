@@ -175,6 +175,7 @@ public class KvargBot implements Player {
 
     private Action river() {
         double handStrength = algorithms.getHandStrength();
+        handStrength += getChenHandScoreAdjustment();
         if (someoneIsAllIn())
             handStrength -= 0.15;
         if (handStrength > 0.9 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
@@ -186,6 +187,19 @@ public class KvargBot implements Player {
         if (handStrength > 0.5 && callAction != null)
             return callAction;
         return checkAction != null ? checkAction : foldAction;
+    }
+
+    private double getChenHandScoreAdjustment () {
+        double chenScore = algorithms.chenFormula();
+        if (chenScore > 15)
+            return 0.15;
+        if (chenScore > 11)
+            return 0.1;
+        if (chenScore > 7)
+            return 0;
+        if (chenScore > 0)
+            return -0.1;
+        return -0.2;
     }
 
     private int getNumberOfOpponents () {
