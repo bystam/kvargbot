@@ -2,7 +2,6 @@ package se.cygni.texasholdem.player;
 
 import se.cygni.texasholdem.game.Card;
 import se.cygni.texasholdem.game.Hand;
-import se.cygni.texasholdem.game.definitions.CardSortBy;
 import se.cygni.texasholdem.game.definitions.Rank;
 
 import java.util.List;
