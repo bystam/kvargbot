@@ -6,9 +6,7 @@ import se.cygni.texasholdem.game.Deck;
 import se.cygni.texasholdem.game.Hand;
 import se.cygni.texasholdem.game.definitions.PokerHand;
 import se.cygni.texasholdem.game.definitions.Rank;
-import static se.cygni.texasholdem.game.definitions.Rank.*;
 
-import se.cygni.texasholdem.game.util.CardsUtil;
 import se.cygni.texasholdem.game.util.PokerHandUtil;
 
 import java.util.ArrayList;
