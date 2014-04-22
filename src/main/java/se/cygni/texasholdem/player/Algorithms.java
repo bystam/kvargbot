@@ -92,6 +92,7 @@ public class Algorithms {
             case TWO_PAIRS: return compareTwoPairs(my, opp);
             case THREE_OF_A_KIND: return compareThreeOfAKing(my, opp);
             case STRAIGHT: return compareStraight (my, opp);
+            case FLUSH: return compareFlush (my, opp);
             default: break;
         }
         return 0;
@@ -125,6 +126,12 @@ public class Algorithms {
         Rank myStraight = CardUtils.getStraightRank(my);
         Rank oppStraight = CardUtils.getStraightRank(opp);
         return compareRanks(myStraight, oppStraight);
+    }
+
+    private int compareFlush(Hand my, Hand opp) {
+        Rank myFlush = CardUtils.getFlushRank(my);
+        Rank oppFlush = CardUtils.getFlushRank(opp);
+        return compareRanks(myFlush, oppFlush);
     }
 
     private int compareRanks (Rank my, Rank opp) {

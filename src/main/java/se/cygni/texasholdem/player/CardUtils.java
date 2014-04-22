@@ -52,4 +52,8 @@ public class CardUtils {
     public static Rank getStraightRank (Hand hand) {
         return getHighHandRank(hand);
     }
+
+    public static Rank getFlushRank (Hand hand) {
+        return getHighHandRank(hand);
+    }
 }
