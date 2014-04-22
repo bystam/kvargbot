@@ -178,7 +178,7 @@ public class KvargBot implements Player {
         handStrength += getChenHandScoreAdjustment();
         if (someoneIsAllIn())
             handStrength -= 0.15;
-        if (handStrength > 0.9 && allInAction != null && !myHand.getPokerHand().equals(PokerHand.ONE_PAIR))
+        if (handStrength > 0.9 && allInAction != null)
             return allIn(handStrength);
         if (handStrength > 0.7 && raiseAction != null)
             return raiseAction;
@@ -219,6 +219,8 @@ public class KvargBot implements Player {
     }
 
     private Action allIn (double handStrength) {
+        if(myHand.getPokerHand().getOrderValue() < PokerHand.THREE_OF_A_KIND.getOrderValue())
+            return raiseAction;
         if (handStrength > 0.95)
             return allInAction;
         long myChips = playState.getMyCurrentChipAmount();
